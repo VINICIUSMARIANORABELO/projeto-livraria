@@ -14,6 +14,11 @@ public class LivroDao implements Dao<Livro, Integer> {
 			+ " PRECO, DESCRICAO FROM ESTOQUE WHERE COD_LIVRO = ?";
 	private static final String CONSULTAR_SQL = "SELECT COD_LIVRO, TITULO, AUTOR, PRECO,"
 			+ " IMAGEM, DESCRICAO FROM ESTOQUE WHERE TITULO LIKE ?";
+	private static final String ALTERAR_SQL = "UPDATE estoque SET TITULO = ?, AUTOR = ?, PRECO = ?,"
+			+ " IMAGEM = ?, DESCRICAO = ? WHERE COD_LIVRO = ?";
+	private static final String REMOVER_SQL = "DELETE FROM estoque WHERE COD_LIVRO = ?";
+	private static final String INCLUIR_SQL = "INSERT INTO estoque COD_LIVRO = ?, TITULO = ?, AUTOR = ?, PRECO = ?,"
+			+ " IMAGEM = ?, DESCRICAO = ? WHERE COD_LIVRO = ?";
 
 	@Override
 	public Livro consultar(Integer codigo) {
@@ -63,6 +68,53 @@ public class LivroDao implements Dao<Livro, Integer> {
 
 	// Faça o restante do CRUD }
 
+	public void alterar(Livro livro) {
+		// Livro livro = null;
+		try (Connection conexao = FabricaConexao.getConexao();
+				PreparedStatement consulta = conexao.prepareStatement(ALTERAR_SQL);) {
+			// TITULO = ?, AUTOR = ?, PRECO = ?," + " IMAGEM = ?, DESCRICAO = ?
+			// WHERE COD_LIVRO = ?";
+			consulta.setString(1, livro.getTitulo());
+			consulta.setString(2, livro.getAutor());
+			consulta.setDouble(3, livro.getPreco());
+			consulta.setString(4, livro.getImagem());
+			consulta.setString(5, livro.getDescricao());
+			consulta.setInt(6, livro.getCodigo());
+			consulta.executeUpdate();
+		} catch (SQLException e) {
+			LOG.severe(e.toString());
+		}
+	}
 
+	public Livro remover(Integer codigo) {
+		Livro livro = null;
+		try (Connection conexao = FabricaConexao.getConexao();
+				PreparedStatement consulta = conexao.prepareStatement(REMOVER_SQL);) {
+			consulta.setInt(1, codigo);
+			consulta.executeUpdate();
+		} catch (SQLException e) {
+			LOG.severe(e.toString());
+		}
+		return livro;
+	}
+
+	public void incluir(Livro livro) {
+		// Livro livro = null;
+		try (Connection conexao = FabricaConexao.getConexao();
+				PreparedStatement consulta = conexao.prepareStatement(INCLUIR_SQL);) {
+// COD_LIVRO, TITULO, AUTOR, PRECO, IMAGEM, DESCRICAO
+			consulta.setInt(1, livro.getCodigo());
+			consulta.setString(2, livro.getTitulo());
+			consulta.setString(3, livro.getAutor());
+			consulta.setDouble(4, livro.getPreco());
+			consulta.setString(5, livro.getImagem());
+			consulta.setString(6, livro.getDescricao());
+			consulta.setInt(7, livro.getCodigo());
+			// * * *** * * *** ver abaixo com o River se é executeQuery ou update
+			consulta.executeUpdate();
+		} catch (SQLException e) {
+			LOG.severe(e.toString());
+		}
+	}
+	
 }
-
